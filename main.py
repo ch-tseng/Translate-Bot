@@ -83,6 +83,9 @@ def click_TranslateDirection():
 	image = image.rotate(180)
 	disp.clear((0, 0, 0))
 	disp.display(image)
+	os.system('omxplayer --no-osd wav/' + fromLanguage + '.wav')
+	os.system('omxplayer --no-osd wav/translate_to.wav')
+	os.system('omxplayer --no-osd wav/' + toLanguage + '.wav')
 	time.sleep(0.5)
 	lastStatus = statusNow
 
@@ -106,6 +109,9 @@ def click_languageSelect():
 	image = image.rotate(180)
 	disp.clear((0, 0, 0))
 	disp.display(image)
+	os.system('omxplayer --no-osd wav/' + fromLanguage + '.wav')
+	os.system('omxplayer --no-osd wav/translate_to.wav')
+	os.system('omxplayer --no-osd wav/' + toLanguage + '.wav')
 	time.sleep(0.5)
 	lastStatus = statusNow	
 
@@ -127,6 +133,8 @@ try:
 			if input_state==0:
 				statusNow = 1
 				print("From:" + fromLanguage + "   To:" + toLanguage)
+				os.system('omxplayer --no-osd wav/pleaseSpeak.wav')
+				time.sleep(0.5)
 
 				r = sr.Recognizer()
 				with sr.Microphone() as source:
@@ -164,7 +172,7 @@ try:
 
 				disp.clear((0, 0, 0))
 				lines = ""
-				font = ImageFont.truetype("fonts/"+toLanguage+".ttf", 21)
+				font = ImageFont.truetype('fonts/' + toLanguage + '.ttf', 21)
 				for words in list(arrayTXT):
 					if(len(lines + " " + words)>13):
 						draw_rotated_text(disp.buffer, lines, (1, lineIndex), 180, font, fill=(255,255,255))
@@ -202,6 +210,7 @@ try:
 			image = image.rotate(180)
 			# Draw the image on the display hardware.
 			disp.display(image)
+			os.system('omxplayer --no-osd wav/unknow_words.wav')
 			time.sleep(3.5)
 
 		except sr.RequestError as e:
@@ -214,12 +223,29 @@ try:
 			image = image.rotate(180)
 	                # Draw the image on the display hardware.
 			disp.display(image)
+			os.system('omxplayer --no-osd wav/error.wav')
 			time.sleep(3.5)
 
 		except:
+			statusNow = 5
+			lastStatus = statusNow
+			image = Image.open("icons/e1.jpg")
+			image = image.rotate(180)
+			disp.display(image)
 			print("Unexpected error")
+			os.system('omxplayer --no-osd wav/error.wav')
+			time.sleep(3.5)
+			#raise
 			
 
 except:
 	print("Unexpected error:", sys.exc_info()[0])
-	raise
+	statusNow = 5
+	lastStatus = statusNow
+	image = Image.open("icons/e1.jpg")
+	image = image.rotate(180)
+	disp.display(image)
+	print("Unexpected error")
+	os.system('omxplayer --no-osd wav/error.wav')
+	time.sleep(3.5)
+	#raise
