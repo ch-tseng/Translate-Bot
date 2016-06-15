@@ -35,13 +35,14 @@ SPI_PORT = 0
 SPI_DEVICE = 0
 
 #font = ImageFont.load_default()
-font = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 21)
+#font = ImageFont.truetype('VCR_OSD_MONO_1.001.ttf', 21)
+font = ImageFont.truetype('fonts/zh-TW.ttf', 21)
 # Create TFT LCD display class.
 disp = TFT.ILI9341(DC, rst=RST, spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE, max_speed_hz=64000000))
 # Initialize display.
 disp.begin()
 
-languages = ["zh-TW", "de", "es", "fr", "it", "ja", "ko", "ru"]
+languages = ["en", "de", "es", "fr", "it", "ja", "ko", "ru"]
 langIndex = 0   # default language
 statusNow = 0  # 0 --> wait, 1 --> listen, 4 --> unknow, 5 --> error, 6 --> Update setting
 lastStatus = -1
@@ -82,7 +83,7 @@ def click_TranslateDirection():
 	image = image.rotate(180)
 	disp.clear((0, 0, 0))
 	disp.display(image)
-	time.sleep(1.5)
+	time.sleep(0.5)
 	lastStatus = statusNow
 
 def click_languageSelect():
@@ -95,7 +96,7 @@ def click_languageSelect():
 	else:
 		langIndex = langIndex + 1
 	
-	if fromLanguage=="en":
+	if fromLanguage=="zh-TW":
 		toLanguage = languages[langIndex]
 	else:
 		fromLanguage = languages[langIndex]
@@ -105,7 +106,7 @@ def click_languageSelect():
 	image = image.rotate(180)
 	disp.clear((0, 0, 0))
 	disp.display(image)
-	time.sleep(1.5)
+	time.sleep(0.5)
 	lastStatus = statusNow	
 
 try:
@@ -125,6 +126,8 @@ try:
 
 			if input_state==0:
 				statusNow = 1
+				print("From:" + fromLanguage + "   To:" + toLanguage)
+
 				r = sr.Recognizer()
 				with sr.Microphone() as source:
 					print("Say something!")
@@ -139,7 +142,7 @@ try:
 
 					audio = r.listen(source)
 
-		                #sttTXT_org = r.recognize_google(audio, key="AIzaSyDMjV3fPEyVyQ6CGv6hZ-5Ndn9vCn-2NtI", language$
+				#sttTXT_org = r.recognize_google(audio, key="AIzaSyDMjV3fPEyVyQ6CGv6hZ-5Ndn9vCn-2NtI", language=fromLanguage)
 				sttTXT_org = r.recognize_google(audio, language = fromLanguage)				
 				print("Google Speech Recognition thinks you said: " + sttTXT_org)
 				image = Image.open("icons/p1.jpg")
@@ -154,9 +157,14 @@ try:
 				lineIndex = 290
 				txtSpeak = blobTranslated.raw
 				#arrayTXT = txtSpeak.split()[::-1]
-				arrayTXT = txtSpeak.split()
+				if toLanguage=="zh-TW" or toLanguage=="ja" or toLanguage=="ko":
+					arrayTXT = list(txtSpeak)
+				else:
+					arrayTXT = txtSpeak.split()
+
 				disp.clear((0, 0, 0))
 				lines = ""
+				font = ImageFont.truetype("fonts/"+toLanguage+".ttf", 21)
 				for words in list(arrayTXT):
 					if(len(lines + " " + words)>13):
 						draw_rotated_text(disp.buffer, lines, (1, lineIndex), 180, font, fill=(255,255,255))
@@ -171,8 +179,8 @@ try:
 				disp.display()
 				tts = gTTS(blobTranslated.raw + ". ", lang=toLanguage)
 				tts.save("tts.mp3")
-				os.system('omxplayer -p -o hdmi tts.mp3')
-				time.sleep(10)
+				os.system('omxplayer --no-osd tts.mp3')
+				time.sleep(3)
 			else:
 				statusNow = 0
 				if(lastStatus != statusNow and statusNow != 1):
@@ -207,6 +215,10 @@ try:
 	                # Draw the image on the display hardware.
 			disp.display(image)
 			time.sleep(3.5)
+
+		except:
+			print("Unexpected error")
+			
 
 except:
 	print("Unexpected error:", sys.exc_info()[0])
