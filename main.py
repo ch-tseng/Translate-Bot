@@ -109,8 +109,8 @@ def click_languageSelect():
 	image = image.rotate(180)
 	disp.clear((0, 0, 0))
 	disp.display(image)
-	os.system('omxplayer --no-osd wav/' + fromLanguage + '.wav')
-	os.system('omxplayer --no-osd wav/translate_to.wav')
+	#os.system('omxplayer --no-osd wav/' + fromLanguage + '.wav')
+	#os.system('omxplayer --no-osd wav/translate_to.wav')
 	os.system('omxplayer --no-osd wav/' + toLanguage + '.wav')
 	time.sleep(0.5)
 	lastStatus = statusNow	
