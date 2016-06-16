@@ -133,7 +133,8 @@ try:
 			if input_state==0:
 				statusNow = 1
 				print("From:" + fromLanguage + "   To:" + toLanguage)
-				os.system('omxplayer --no-osd wav/pleaseSpeak.wav')
+				os.system('omxplayer --no-osd wav/speak_words.wav')
+				os.system('omxplayer --no-osd wav/' + fromLanguage + '.wav')
 				time.sleep(0.5)
 
 				r = sr.Recognizer()
